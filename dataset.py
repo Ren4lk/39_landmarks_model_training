@@ -56,6 +56,8 @@ class ProfileLandmarksDataset(Dataset):
         if self.transform:
             image, landmarks = self.transform(
                 image, landmarks, crops)
+            
+        landmarks = landmarks - 0.5
 
         return image, landmarks
 
@@ -66,7 +68,7 @@ if __name__ == '__main__':
 
     while True:
         image, landmarks = dataset[random.randint(0, len(dataset))]
-        landmarks = (landmarks) * 224
+        landmarks = (landmarks + 0.5) * 224
         plt.figure(figsize=(10, 10))
         plt.imshow(image.numpy().squeeze(), cmap='gray')
         plt.scatter(landmarks[:, 0], landmarks[:, 1], s=8)
