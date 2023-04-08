@@ -7,7 +7,7 @@ class Network(nn.Module):
         super().__init__()
 
         self.model_name = 'resnet50'
-        self.model = models.resnet50(models.ResNet50_Weights)
+        self.model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
         self.model.conv1 = nn.Conv2d(
             1, 64, kernel_size=7, stride=2, padding=3, bias=False)
         self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)
