@@ -54,7 +54,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(network.parameters(), lr=0.0001)
 
     loss_min = np.inf
-    NUM_EPOCHS = 1000
+    NUM_EPOCHS = 500
 
     start_time = time.time()
     for epoch in range(1, NUM_EPOCHS+1):
