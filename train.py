@@ -108,7 +108,7 @@ if __name__ == '__main__':
                 loss_valid += loss_valid_step.item()
                 running_loss = loss_valid/step
 
-                landmark_error = np.linalg.norm(predictions - landmarks,
+                landmark_error = np.linalg.norm(predictions.cpu() - landmarks.cpu(),
                                                 axis=1)
 
                 total_error += np.sum(landmark_error)
