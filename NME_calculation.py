@@ -22,7 +22,7 @@ if __name__ == '__main__':
     crops = []
     landmarks = []
 
-    with open('/home/renat/repos/39_landmarks_model_training/annotation_file.txt', 'r') as f:
+    with open('39_landmarks_model_training/annotation_file.txt', 'r') as f:
         lines = f.readlines()
         for l in lines:
             data = l.split()
@@ -33,7 +33,7 @@ if __name__ == '__main__':
                                   for t in zip(points[0::2], points[1::2])))
     network = fl_model.Network()
     network.load_state_dict(torch.load(
-        '/home/renat/repos/39_landmarks_model_training/resnet18_not_pretrained_face_39_landmarks_weights_900_epochs.pth'))
+        '39_landmarks_model_training/resnet18_not_pretrained_face_39_landmarks_weights_900_epochs.pth'))
     network.eval()
 
     total_error = 0
