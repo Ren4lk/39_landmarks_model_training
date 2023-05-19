@@ -32,6 +32,12 @@ def printEpochInfoInFile(file_name, epoch, loss_valid, loss_train=None, total_ep
                     loss_valid, epoch, total_epochs))
 
 
+def printMeanErrorInFile(file_name, mean_err, epoch, total_epochs):
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
+        result_file.write("Epoch: {}/{} Mean Error: {:.4f}\n".format(
+            epoch, total_epochs, mean_err))
+
+
 if __name__ == '__main__':
     ds = dataset.ProfileLandmarksDataset(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                                       'annotation_file.txt'),
@@ -46,12 +52,12 @@ if __name__ == '__main__':
                                                                    [len_train_set, len_valid_set])
 
     train_loader = DataLoader(train_dataset,
-                              batch_size=64,
+                              batch_size=32,
                               shuffle=True,
                               num_workers=4)
 
     valid_loader = DataLoader(valid_dataset,
-                              batch_size=64,
+                              batch_size=32,
                               shuffle=True,
                               num_workers=4)
 
@@ -72,10 +78,10 @@ if __name__ == '__main__':
 
         network.train()
         for step in range(1, len(train_loader)+1):
-            images, landmarks = next(iter(train_loader))
-            images = images.cuda()
+            image, landmarks = next(iter(train_loader))
+            image = image.cuda()
             landmarks = landmarks.view(landmarks.size(0), -1).cuda()
-            predictions = network(images)
+            predictions = network(image)
             optimizer.zero_grad()
             loss_train_step = criterion(predictions, landmarks)
             loss_train_step.backward()
@@ -91,14 +97,22 @@ if __name__ == '__main__':
                             'train')
         network.eval()
         with torch.no_grad():
+            total_error = 0
+            num_landmarks = 0
             for step in range(1, len(valid_loader)+1):
-                images, landmarks = next(iter(valid_loader))
-                images = images.cuda()
+                image, landmarks = next(iter(valid_loader))
+                image = image.cuda()
                 landmarks = landmarks.view(landmarks.size(0), -1).cuda()
-                predictions = network(images)
+                predictions = network(image)
                 loss_valid_step = criterion(predictions, landmarks)
                 loss_valid += loss_valid_step.item()
                 running_loss = loss_valid/step
+
+                landmark_error = np.linalg.norm(predictions - landmarks,
+                                                axis=1)
+
+                total_error += np.sum(landmark_error)
+                num_landmarks += len(landmark_error)
 
                 printStepInFile('train_info.txt',
                                 epoch,
@@ -106,6 +120,13 @@ if __name__ == '__main__':
                                 len(valid_loader),
                                 running_loss,
                                 'valid')
+
+            mean_error = total_error / num_landmarks
+            printMeanErrorInFile('mean_error_info.txt',
+                                 mean_error,
+                                 epoch,
+                                 NUM_EPOCHS)
+
         loss_train /= len(train_loader)
         loss_valid /= len(valid_loader)
 
