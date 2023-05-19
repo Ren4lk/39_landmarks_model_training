@@ -9,8 +9,7 @@ def getDataRow(path_to_dir, line: str) -> str:
 def writeAnnotations(profile_file_path,
                      image_dir,
                      target_file):
-    with open(profile_file_path, 'r') as profile, \
-            open(target_file, 'a') as target:
+    with open(profile_file_path, 'r') as profile, open(target_file, 'a') as target:
         profiles = profile.readlines()
 
         for prof in profiles:
@@ -18,7 +17,6 @@ def writeAnnotations(profile_file_path,
 
 
 if __name__ == '__main__':
-
     profile_train = 'Menpo2D/Train/Menpo2D_profile_train.txt'
     image_dir_train = os.path.abspath('Menpo2D/Train')
 

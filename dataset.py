@@ -31,12 +31,12 @@ class ProfileLandmarksDataset(Dataset):
         return len(self.images)
 
     def __flipLandmarks(self, points, image):
-        h, w = image.shape[:2]
+        _, w = image.shape[:2]
         result = [[w-x, y] for x, y in points]
         return result
 
     def __flipCrops(self, crops, image):
-        h, w = image.shape[:2]
+        _, w = image.shape[:2]
         x1 = crops[0]
         y1 = crops[1]
         x2 = crops[2]
@@ -56,7 +56,7 @@ class ProfileLandmarksDataset(Dataset):
         if self.transform:
             image, landmarks = self.transform(
                 image, landmarks, crops)
-            
+
         landmarks = landmarks - 0.5
 
         return image, landmarks
@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     while True:
         image, landmarks = dataset[random.randint(0, len(dataset))]
-        landmarks = (landmarks + 0.5) * 224
+        landmarks = (landmarks + 0.5) * 300
         plt.figure(figsize=(10, 10))
         plt.imshow(image.numpy().squeeze(), cmap='gray')
         plt.scatter(landmarks[:, 0], landmarks[:, 1], s=8)

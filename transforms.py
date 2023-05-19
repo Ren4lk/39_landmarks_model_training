@@ -55,7 +55,7 @@ class Transforms():
     def __call__(self, image, landmarks, crops):
         image = Image.fromarray(image)
         image, landmarks = self.crop_face(image, landmarks, crops)
-        image, landmarks = self.resize(image, landmarks, (224, 224))
+        image, landmarks = self.resize(image, landmarks, (300, 300))
         image, landmarks = self.color_jitter(image, landmarks)
         image, landmarks = self.rotate(image, landmarks, angle=10)
 

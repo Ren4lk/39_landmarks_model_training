@@ -12,41 +12,48 @@ import fl_model
 
 
 def printStepInFile(file_name, epoch, step, total_step, loss, operation):
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as file:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
         if operation == 'train':
-            file.write("Epoch: %d  Train Steps: %d/%d  Loss: %.4f \n" %
-                       (epoch, step, total_step, loss))
+            result_file.write("Epoch: %d  Train Steps: %d/%d  Loss: %.4f \n" %
+                              (epoch, step, total_step, loss))
         elif operation == 'valid':
-            file.write("Epoch: %d  Valid Steps: %d/%d  Loss: %.4f \n" %
-                       (epoch, step, total_step, loss))
+            result_file.write("Epoch: %d  Valid Steps: %d/%d  Loss: %.4f \n" %
+                              (epoch, step, total_step, loss))
 
 
-def printEpochInfoInFile(file, epoch, loss_valid, loss_train=None, total_epochs=None):
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file), 'a') as file:
+def printEpochInfoInFile(file_name, epoch, loss_valid, loss_train=None, total_epochs=None):
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
         if loss_train:
-            file.write('Epoch: {}  Train Loss: {:.4f}  Valid Loss: {:.4f}\n'.format(
+            result_file.write('Epoch: {}  Train Loss: {:.4f}  Valid Loss: {:.4f}\n'.format(
                 epoch, loss_train, loss_valid))
         else:
-            file.write(
-                "Minimum Validation Loss of {:.4f} at epoch {}/{}\nModel Saved!\n".format(loss_valid, epoch, total_epochs))
+            result_file.write(
+                "Minimum Validation Loss of {:.4f} at epoch {}/{}\nModel Saved!\n".format(
+                    loss_valid, epoch, total_epochs))
 
 
 if __name__ == '__main__':
-    ds = dataset.ProfileLandmarksDataset(os.path.join(os.path.dirname(
-        os.path.abspath(__file__)), 'annotation_file.txt'), transform=transforms.Transforms())
+    ds = dataset.ProfileLandmarksDataset(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                      'annotation_file.txt'),
+                                         transform=transforms.Transforms())
     len_valid_set = int(0.1*len(ds))
     len_train_set = len(ds) - len_valid_set
 
     print("The length of Train set is {}".format(len_train_set))
     print("The length of Valid set is {}".format(len_valid_set))
 
-    train_dataset, valid_dataset,  = torch.utils.data.random_split(
-        ds, [len_train_set, len_valid_set])
+    train_dataset, valid_dataset,  = torch.utils.data.random_split(ds,
+                                                                   [len_train_set, len_valid_set])
 
-    train_loader = DataLoader(
-        train_dataset, batch_size=64, shuffle=True, num_workers=4)
-    valid_loader = DataLoader(
-        valid_dataset, batch_size=64, shuffle=True, num_workers=4)
+    train_loader = DataLoader(train_dataset,
+                              batch_size=64,
+                              shuffle=True,
+                              num_workers=4)
+
+    valid_loader = DataLoader(valid_dataset,
+                              batch_size=64,
+                              shuffle=True,
+                              num_workers=4)
 
     torch.autograd.set_detect_anomaly(True)
     network = fl_model.Network().cuda()
@@ -54,7 +61,7 @@ if __name__ == '__main__':
     optimizer = optim.Adam(network.parameters(), lr=0.0001)
 
     loss_min = np.inf
-    NUM_EPOCHS = 500
+    NUM_EPOCHS = 2000
 
     start_time = time.time()
     for epoch in range(1, NUM_EPOCHS+1):
@@ -82,7 +89,6 @@ if __name__ == '__main__':
                             len(train_loader),
                             running_loss,
                             'train')
-
         network.eval()
         with torch.no_grad():
             for step in range(1, len(valid_loader)+1):
@@ -100,7 +106,6 @@ if __name__ == '__main__':
                                 len(valid_loader),
                                 running_loss,
                                 'valid')
-
         loss_train /= len(train_loader)
         loss_valid /= len(valid_loader)
 
@@ -115,8 +120,12 @@ if __name__ == '__main__':
                                  epoch,
                                  loss_valid,
                                  total_epochs=NUM_EPOCHS)
-            torch.save(network.state_dict(), os.path.join(
-                os.path.dirname(os.path.abspath(__file__)), f'face_39_landmarks_weights.pth'))
+            torch.save(network.state_dict(),
+                       os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                    f'{network.model_name}_face_39_landmarks_weights.pth'))
+        if epoch % 100 == 0:
+            torch.save(network.state_dict(), os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                          f'{network.model_name}_face_39_landmarks_weights_epoch_{epoch}.pth'))
 
         print('Training Complete')
         print("Total Elapsed Time : {} s".format(time.time()-start_time))
