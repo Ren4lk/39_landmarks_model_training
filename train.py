@@ -78,10 +78,10 @@ if __name__ == '__main__':
 
         network.train()
         for step in range(1, len(train_loader)+1):
-            image, landmarks = next(iter(train_loader))
-            image = image.cuda()
+            images, landmarks = next(iter(train_loader))
+            images = images.cuda()
             landmarks = landmarks.view(landmarks.size(0), -1).cuda()
-            predictions = network(image)
+            predictions = network(images)
             optimizer.zero_grad()
             loss_train_step = criterion(predictions, landmarks)
             loss_train_step.backward()
@@ -100,10 +100,10 @@ if __name__ == '__main__':
             total_error = 0
             num_landmarks = 0
             for step in range(1, len(valid_loader)+1):
-                image, landmarks = next(iter(valid_loader))
-                image = image.cuda()
+                images, landmarks = next(iter(valid_loader))
+                images = images.cuda()
                 landmarks = landmarks.view(landmarks.size(0), -1).cuda()
-                predictions = network(image)
+                predictions = network(images)
                 loss_valid_step = criterion(predictions, landmarks)
                 loss_valid += loss_valid_step.item()
                 running_loss = loss_valid/step
