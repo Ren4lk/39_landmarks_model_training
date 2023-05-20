@@ -14,27 +14,27 @@ import fl_model
 def printStepInFile(file_name, epoch, step, total_step, loss, operation):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
         if operation == 'train':
-            result_file.write("Epoch: %d  Train Steps: %d/%d  Loss: %.4f \n" %
+            result_file.write("Epoch: %d  Train Steps: %d/%d  Loss: %.20f \n" %
                               (epoch, step, total_step, loss))
         elif operation == 'valid':
-            result_file.write("Epoch: %d  Valid Steps: %d/%d  Loss: %.4f \n" %
+            result_file.write("Epoch: %d  Valid Steps: %d/%d  Loss: %.20f \n" %
                               (epoch, step, total_step, loss))
 
 
 def printEpochInfoInFile(file_name, epoch, loss_valid, loss_train=None, total_epochs=None):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
         if loss_train:
-            result_file.write('Epoch: {}  Train Loss: {:.4f}  Valid Loss: {:.4f}\n'.format(
+            result_file.write('Epoch: {}  Train Loss: {:.20f}  Valid Loss: {:.20f}\n'.format(
                 epoch, loss_train, loss_valid))
         else:
             result_file.write(
-                "Minimum Validation Loss of {:.4f} at epoch {}/{}\nModel Saved!\n".format(
+                "Minimum Validation Loss of {:.20f} at epoch {}/{}\nModel Saved!\n".format(
                     loss_valid, epoch, total_epochs))
 
 
 def printMeanErrorInFile(file_name, mean_err, epoch, total_epochs):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name), 'a') as result_file:
-        result_file.write("Epoch: {}/{} Mean Error: {:.4f}\n".format(
+        result_file.write("Epoch: {}/{} Mean Error: {:.20f}\n".format(
             epoch, total_epochs, mean_err))
 
 
@@ -52,12 +52,12 @@ if __name__ == '__main__':
                                                                    [len_train_set, len_valid_set])
 
     train_loader = DataLoader(train_dataset,
-                              batch_size=32,
+                              batch_size=2,
                               shuffle=True,
                               num_workers=4)
 
     valid_loader = DataLoader(valid_dataset,
-                              batch_size=32,
+                              batch_size=2,
                               shuffle=True,
                               num_workers=4)
 
