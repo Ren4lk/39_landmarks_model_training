@@ -52,12 +52,12 @@ if __name__ == '__main__':
                                                                    [len_train_set, len_valid_set])
 
     train_loader = DataLoader(train_dataset,
-                              batch_size=2,
+                              batch_size=32,
                               shuffle=True,
                               num_workers=4)
 
     valid_loader = DataLoader(valid_dataset,
-                              batch_size=2,
+                              batch_size=32,
                               shuffle=True,
                               num_workers=4)
 
